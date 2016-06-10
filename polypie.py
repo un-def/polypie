@@ -73,7 +73,6 @@ def polymorphic(func):
     else:
         if parameters_tuple in _registry[func_name]:
             hints = get_type_hints(func)
-            print(hints)
             sig_gen = ('{}:{}'.format(p, hints[p]) if p in hints else p
                        for p in parameters)
             raise PolypieException(
