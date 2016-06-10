@@ -47,6 +47,8 @@ def polymorphic(func):
     if func_name not in registry:
         def wrapper(*args, **kwargs):
             return _call_func(func_name, args, kwargs)
+        wrapper.__name__ = func_name
+        wrapper.__qualname__ = func.__qualname__
         registry[func_name] = OrderedDict((
             ('wrapper', wrapper),
             (sig, func),
