@@ -3,5 +3,7 @@
 example.py
 README.md
 
+.tox/
+
 dist/
 polypie.egg-info/
