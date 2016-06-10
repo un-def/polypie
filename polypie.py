@@ -6,7 +6,7 @@ from typecheck import typecheck, TypeCheckError
 
 
 __author__ = 'un.def <un.def@ya.ru>'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 registry = {}
