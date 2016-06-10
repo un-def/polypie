@@ -46,7 +46,7 @@ Example
     example(['foo'])   # (3)
     example(('bar', 'baz'))   # (3)
     try:
-        example(['foo', 100])
+        example({'foo': 'bar'})
     except PolypieException as exc:
         print(exc)   # Matching signature <...> not found
 
