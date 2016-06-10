@@ -92,18 +92,18 @@ class PolymorphicFunctionsTestCase(unittest.TestCase):
     def test_typing_annotations(self):
 
         @polypie.polymorphic
-        def f(a: Any, b: Sequence[int]):
+        def f(a: Any, b: Sequence):
             return 'Any, Sequence'
 
         @polypie.polymorphic
-        def f(a: Tuple[int, str], b: Union[int, str]):
+        def f(a: Tuple[int, str], b: Union[int, bool]):
             return 'Tuple, Union'
 
         self.assertEqual(f(120, [1, 2, 3]), 'Any, Sequence')
         self.assertEqual(f((120, 'foo'), 120), 'Tuple, Union')
-        self.assertEqual(f((120, 'foo'), 'bar'), 'Tuple, Union')
+        self.assertEqual(f((120, 'foo'), True), 'Tuple, Union')
         with self.assertRaisesRegex(polypie.PolypieException, 'not found'):
-            f(('foo', 120), 'bar')
+            f(('foo', 120), 100)
         with self.assertRaisesRegex(polypie.PolypieException, 'not found'):
             f((120, 'foo'), None)
 

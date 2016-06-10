@@ -1,4 +1,4 @@
-from inspect import Signature
+from inspect import Signature, signature, Parameter
 from typing import get_type_hints
 from collections import OrderedDict
 
@@ -9,7 +9,7 @@ __author__ = 'un.def <un.def@ya.ru>'
 __version__ = '0.1.1'
 
 
-registry = {}
+_registry = {}
 
 
 class PolypieException(Exception):
@@ -17,14 +17,29 @@ class PolypieException(Exception):
     pass
 
 
+class HashableParameter(Parameter):
+
+    def __hash__(self):
+        return hash((self.name, self.kind, self.default, self.annotation))
+
+    @staticmethod
+    def from_parameter(parameter):
+        return HashableParameter(
+            name=parameter.name,
+            kind=parameter.kind,
+            default=parameter.default,
+            annotation=parameter.annotation
+        )
+
+
 def _call_func(func_name, args=None, kwargs=None):
     args = args or ()
     kwargs = kwargs or {}
-    for sig, func in registry[func_name].items():
-        if sig == 'wrapper':
+    for parameters_tuple, func in _registry[func_name].items():
+        if parameters_tuple == 'wrapper':
             continue
         try:
-            sig.bind(*args, **kwargs)
+            Signature(parameters_tuple).bind(*args, **kwargs)
         except TypeError:
             continue
         try:
@@ -40,29 +55,32 @@ def _call_func(func_name, args=None, kwargs=None):
 
 
 def polymorphic(func):
-    global registry
+    global _registry
     func_name = func.__name__
-    sig = Signature.from_callable(func)
-    sig = Signature(sig.parameters.values())
-    if func_name not in registry:
+    parameters = signature(func).parameters
+    parameters_tuple = tuple(
+        HashableParameter.from_parameter(p) for p in parameters.values())
+    if func_name not in _registry:
         def wrapper(*args, **kwargs):
             return _call_func(func_name, args, kwargs)
         wrapper.__name__ = func_name
         wrapper.__qualname__ = func.__qualname__
-        registry[func_name] = OrderedDict((
+        _registry[func_name] = OrderedDict((
             ('wrapper', wrapper),
-            (sig, func),
+            (parameters_tuple, func),
         ))
         return wrapper
     else:
-        if sig in registry[func_name]:
+        if parameters_tuple in _registry[func_name]:
             hints = get_type_hints(func)
-            sig_gen = ("{}:{}".format(p, hints[p]) for p in sig.parameters)
+            print(hints)
+            sig_gen = ('{}:{}'.format(p, hints[p]) if p in hints else p
+                       for p in parameters)
             raise PolypieException(
                 "Function '{func}' with signature ({sig}) "
                 "already exists".format(func=func_name,
-                                        sig=", ".join(sig_gen))
+                                        sig=', '.join(sig_gen))
             )
         else:
-            registry[func_name][sig] = func
-            return registry[func_name]['wrapper']
+            _registry[func_name][parameters_tuple] = func
+            return _registry[func_name]['wrapper']

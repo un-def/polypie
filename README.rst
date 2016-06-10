@@ -13,7 +13,7 @@ Installation
 Requirements
 ~~~~~~~~~~~~
 
--  Python 3.5+
+-  Python 3.3+
 -  `typecheck-decorator <https://github.com/prechelt/typecheck-decorator>`__
 
 Example
