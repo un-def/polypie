@@ -1,0 +1,7 @@
+*.pyc
+
+example.py
+README.md
+
+dist/
+polypie.egg-info/
