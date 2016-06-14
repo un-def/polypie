@@ -90,7 +90,6 @@ class PolymorphicFunctionsTestCase(unittest.TestCase):
             f(foo, foo)
 
     def test_typing_annotations(self):
-
         @polypie.polymorphic
         def f(a: Any, b: Sequence):
             return 'Any, Sequence'
@@ -106,6 +105,25 @@ class PolymorphicFunctionsTestCase(unittest.TestCase):
             f(('foo', 120), 100)
         with self.assertRaisesRegex(polypie.PolypieException, 'not found'):
             f((120, 'foo'), None)
+
+    def test_name_clashing(self):
+        from test_fixtures import module1, module2
+        TOP = 'top'
+        WRAPPED = 'wrapped'
+
+        @polypie.polymorphic
+        def check_clash(a: int):
+            return TOP
+
+        class Wrapper:
+            @polypie.polymorphic
+            def check_clash(a: int):
+                return WRAPPED
+
+        self.assertEqual(check_clash(1), TOP)
+        self.assertEqual(Wrapper.check_clash(1), WRAPPED)
+        self.assertEqual(module1.check_clash(1), module1.RESULT)
+        self.assertEqual(module2.check_clash(1), module2.RESULT)
 
 
 if __name__ == '__main__':

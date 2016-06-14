@@ -32,10 +32,10 @@ class HashableParameter(Parameter):
         )
 
 
-def _call_func(func_name, args=None, kwargs=None):
+def _call_func(func_key, args=None, kwargs=None):
     args = args or ()
     kwargs = kwargs or {}
-    for parameters_tuple, func in _registry[func_name].items():
+    for parameters_tuple, func in _registry[func_key].items():
         if parameters_tuple == 'wrapper':
             continue
         try:
@@ -48,7 +48,7 @@ def _call_func(func_name, args=None, kwargs=None):
             pass
     raise PolypieException(
         "Matсhing signature for function '{func}' with "
-        "args={args} and kwargs={kwargs} not found".format(func=func_name,
+        "args={args} and kwargs={kwargs} not found".format(func=func_key,
                                                            args=args,
                                                            kwargs=kwargs)
     )
@@ -56,30 +56,30 @@ def _call_func(func_name, args=None, kwargs=None):
 
 def polymorphic(func):
     global _registry
-    func_name = func.__name__
+    func_key = func.__module__ + '.' + func.__qualname__
     parameters = signature(func).parameters
     parameters_tuple = tuple(
         HashableParameter.from_parameter(p) for p in parameters.values())
-    if func_name not in _registry:
+    if func_key not in _registry:
         def wrapper(*args, **kwargs):
-            return _call_func(func_name, args, kwargs)
-        wrapper.__name__ = func_name
+            return _call_func(func_key, args, kwargs)
+        wrapper.__name__ = func.__name__
         wrapper.__qualname__ = func.__qualname__
-        _registry[func_name] = OrderedDict((
+        _registry[func_key] = OrderedDict((
             ('wrapper', wrapper),
             (parameters_tuple, func),
         ))
         return wrapper
     else:
-        if parameters_tuple in _registry[func_name]:
+        if parameters_tuple in _registry[func_key]:
             hints = get_type_hints(func)
             sig_gen = ('{}:{}'.format(p, hints[p]) if p in hints else p
                        for p in parameters)
             raise PolypieException(
                 "Function '{func}' with signature ({sig}) "
-                "already exists".format(func=func_name,
+                "already exists".format(func=func_key,
                                         sig=', '.join(sig_gen))
             )
         else:
-            _registry[func_name][parameters_tuple] = func
-            return _registry[func_name]['wrapper']
+            _registry[func_key][parameters_tuple] = func
+            return _registry[func_key]['wrapper']
