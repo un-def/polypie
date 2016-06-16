@@ -1,6 +1,8 @@
 polypie
 =======
 
+|Build Status| |Coverage Status| |PyPI version| |PyPI license|
+
 Python polymorphic function declaration with obvious syntax. Just use
 the same function name and mark each function definition with
 ``@polymorphic`` decorator.
@@ -70,3 +72,18 @@ Example
     instance.value('bar', 'baz')
     print(instance.value('foo'))   # 100
     print(instance.value('bar'))   # baz
+
+Tests
+~~~~~
+
+1. Install dependencies: ``pip install -r requirements_dev.txt``
+2. ``nosetests --with-coverage`` or ``tox``
+
+.. |Build Status| image:: https://travis-ci.org/un-def/polypie.svg?branch=master
+   :target: https://travis-ci.org/un-def/polypie
+.. |Coverage Status| image:: https://coveralls.io/repos/github/un-def/polypie/badge.svg?branch=master
+   :target: https://coveralls.io/github/un-def/polypie?branch=master
+.. |PyPI version| image:: https://badge.fury.io/py/polypie.svg
+   :target: https://pypi.python.org/pypi/polypie/
+.. |PyPI license| image:: https://img.shields.io/pypi/l/polypie.svg?maxAge=3600
+   :target: https://raw.githubusercontent.com/un-def/polypie/master/LICENSE
