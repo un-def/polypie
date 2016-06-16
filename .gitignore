@@ -5,5 +5,7 @@ README.md
 
 .tox/
 
+.coverage
+
 dist/
 polypie.egg-info/
