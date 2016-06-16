@@ -195,6 +195,29 @@ class PolypieTestCase(unittest.TestCase):
         self.assertEqual(instance.static_getter(instance), '100')
         self.assertEqual(instance.static_getter(TestClass), '200')
 
+    def test_exception_due_to_existent_signature(self):
+        @polypie.polymorphic
+        def f(a):
+            pass
+
+        @polypie.polymorphic
+        def f(a, b):
+            pass
+
+        @polypie.polymorphic
+        def f(a, b: str):
+            pass
+
+        @polypie.polymorphic
+        def f(a, b: int):
+            pass
+
+        with self.assertRaisesRegex(
+                polypie.PolypieException, "already exists"):
+            @polypie.polymorphic
+            def f(a, b: str):
+                pass
+
 
 if __name__ == '__main__':
     unittest.main()
