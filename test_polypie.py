@@ -5,7 +5,7 @@ from typing import Any, Sequence, Tuple, Union
 import polypie
 
 
-class PolymorphicFunctionsTestCase(unittest.TestCase):
+class PolypieTestCase(unittest.TestCase):
 
     def setUp(self):
         reload(polypie)
@@ -124,6 +124,76 @@ class PolymorphicFunctionsTestCase(unittest.TestCase):
         self.assertEqual(Wrapper.check_clash(1), WRAPPED)
         self.assertEqual(module1.check_clash(1), module1.RESULT)
         self.assertEqual(module2.check_clash(1), module2.RESULT)
+
+    def test_methods(self):
+        class TestClass:
+
+            value = 'cls'
+
+            def __init__(self):
+                self.value = None
+
+            def getter(self):
+                return self.value
+
+            @polypie.polymorphic
+            def setter(self, value: str):
+                self.value = value
+
+            @polypie.polymorphic
+            def setter(self, value: int):
+                self.value = str(value)
+
+            @classmethod
+            def cls_getter(cls):
+                return cls.value
+
+            @classmethod
+            @polypie.polymorphic
+            def cls_setter(cls, value: str):
+                cls.value = value
+
+            @classmethod
+            @polypie.polymorphic
+            def cls_setter(cls, value: int):
+                cls.value = str(value)
+
+            @staticmethod
+            def static_getter(obj):
+                return obj.value
+
+            @staticmethod
+            @polypie.polymorphic
+            def static_setter(obj, value: str):
+                obj.value = value
+
+            @staticmethod
+            @polypie.polymorphic
+            def static_setter(obj, value: int):
+                obj.value = str(value)
+
+        instance = TestClass()
+        # instance methods
+        instance.setter('foo')
+        self.assertEqual(instance.getter(), 'foo')
+        instance.setter(1)
+        self.assertEqual(instance.getter(), '1')
+        # cls methods
+        self.assertEqual(instance.cls_getter(), 'cls')
+        instance.cls_setter('bar')
+        self.assertEqual(instance.cls_getter(), 'bar')
+        instance.cls_setter(2)
+        self.assertEqual(instance.cls_getter(), '2')
+        self.assertEqual(instance.getter(), '1')
+        # static methods
+        instance.static_setter(instance, 'baz')
+        instance.static_setter(TestClass, 'xyzzy')
+        self.assertEqual(instance.static_getter(instance), 'baz')
+        self.assertEqual(instance.static_getter(TestClass), 'xyzzy')
+        instance.static_setter(instance, 100)
+        instance.static_setter(TestClass, 200)
+        self.assertEqual(instance.static_getter(instance), '100')
+        self.assertEqual(instance.static_getter(TestClass), '200')
 
 
 if __name__ == '__main__':
