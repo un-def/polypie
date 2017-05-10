@@ -22,9 +22,9 @@ class HashableParameter(Parameter):
     def __hash__(self):
         return hash((self.name, self.kind, self.default, self.annotation))
 
-    @staticmethod
-    def from_parameter(parameter):
-        return HashableParameter(
+    @classmethod
+    def from_parameter(cls, parameter):
+        return cls(
             name=parameter.name,
             kind=parameter.kind,
             default=parameter.default,
@@ -36,8 +36,6 @@ def _call_func(func_key, args=None, kwargs=None):
     args = args or ()
     kwargs = kwargs or {}
     for parameters_tuple, func in _registry[func_key].items():
-        if parameters_tuple == 'wrapper':
-            continue
         try:
             Signature(parameters_tuple).bind(*args, **kwargs)
         except TypeError:
@@ -65,10 +63,10 @@ def polymorphic(func):
             return _call_func(func_key, args, kwargs)
         wrapper.__name__ = func.__name__
         wrapper.__qualname__ = func.__qualname__
-        _registry[func_key] = OrderedDict((
-            ('wrapper', wrapper),
-            (parameters_tuple, func),
-        ))
+        signature_mapping = OrderedDict()
+        signature_mapping[parameters_tuple] = func
+        signature_mapping.wrapper = wrapper
+        _registry[func_key] = signature_mapping
         return wrapper
     else:
         if parameters_tuple in _registry[func_key]:
@@ -82,4 +80,4 @@ def polymorphic(func):
             )
         else:
             _registry[func_key][parameters_tuple] = func
-            return _registry[func_key]['wrapper']
+            return _registry[func_key].wrapper
