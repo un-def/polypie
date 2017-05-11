@@ -1,6 +1,7 @@
+from collections import OrderedDict
+from functools import wraps
 from inspect import Signature, signature, Parameter
 from typing import get_type_hints
-from collections import OrderedDict
 
 from typecheck import typecheck, TypeCheckError
 
@@ -13,12 +14,10 @@ _registry = {}
 
 
 class PolypieException(Exception):
-
     pass
 
 
 class HashableParameter(Parameter):
-
     def __hash__(self):
         return hash((self.name, self.kind, self.default, self.annotation))
 
@@ -32,9 +31,7 @@ class HashableParameter(Parameter):
         )
 
 
-def _call_func(func_key, args=None, kwargs=None):
-    args = args or ()
-    kwargs = kwargs or {}
+def _call_func(func_key, args=(), kwargs={}):
     for parameters_tuple, func in _registry[func_key].items():
         if parameters_tuple == 'wrapper':
             continue
@@ -55,16 +52,14 @@ def _call_func(func_key, args=None, kwargs=None):
 
 
 def polymorphic(func):
-    global _registry
     func_key = func.__module__ + '.' + func.__qualname__
     parameters = signature(func).parameters
     parameters_tuple = tuple(
         HashableParameter.from_parameter(p) for p in parameters.values())
     if func_key not in _registry:
+        @wraps(func)
         def wrapper(*args, **kwargs):
             return _call_func(func_key, args, kwargs)
-        wrapper.__name__ = func.__name__
-        wrapper.__qualname__ = func.__qualname__
         _registry[func_key] = OrderedDict((
             ('wrapper', wrapper),
             (parameters_tuple, func),
@@ -83,3 +78,6 @@ def polymorphic(func):
         else:
             _registry[func_key][parameters_tuple] = func
             return _registry[func_key]['wrapper']
+
+
+__all__ = [PolypieException.__name__, polymorphic.__name__]
