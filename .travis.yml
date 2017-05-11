@@ -1,12 +1,18 @@
+sudo: false
 language: python
+cache: pip
 python:
   - 3.3
   - 3.4
   - 3.5
+  - 3.6
 install:
-  - pip install -r requirements_dev.txt
-  - pip install coveralls
+  - travis_retry pip install tox-travis
 script:
-  - nosetests --with-coverage
+  - tox
 after_success:
   coveralls
+
+matrix:
+  allow_failures:
+  - python: 3.6  # FIXME
