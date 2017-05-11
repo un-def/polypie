@@ -4,7 +4,7 @@ example.py
 README.md
 
 .tox/
-
+.cache/
 .coverage
 
 dist/
