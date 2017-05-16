@@ -107,7 +107,7 @@ class PolypieTestCase(unittest.TestCase):
             f((120, 'foo'), None)
 
     def test_name_clashing(self):
-        from test_fixtures import module1, module2
+        from test_fixtures import clash1, clash2
         TOP = 'top'
         WRAPPED = 'wrapped'
 
@@ -122,8 +122,8 @@ class PolypieTestCase(unittest.TestCase):
 
         self.assertEqual(check_clash(1), TOP)
         self.assertEqual(Wrapper.check_clash(1), WRAPPED)
-        self.assertEqual(module1.check_clash(1), module1.RESULT)
-        self.assertEqual(module2.check_clash(1), module2.RESULT)
+        self.assertEqual(clash1.check_clash(1), clash1.RESULT)
+        self.assertEqual(clash2.check_clash(1), clash2.RESULT)
 
     def test_methods(self):
         class TestClass:
@@ -217,6 +217,20 @@ class PolypieTestCase(unittest.TestCase):
             @polypie.polymorphic
             def f(a, b: str):
                 pass
+
+    def test_function_special_attrs(self):
+        from test_fixtures.specialattrs import Wrapper
+
+        self.assertEqual(Wrapper.check_special_attrs.__name__,
+                         Wrapper.NAME)
+        self.assertEqual(Wrapper.check_special_attrs.__qualname__,
+                         Wrapper.QUALNAME)
+        self.assertEqual(Wrapper.check_special_attrs.__module__,
+                         Wrapper.MODULE)
+        self.assertEqual(Wrapper.check_special_attrs.attr1, Wrapper.ATTR1)
+        self.assertEqual(Wrapper.check_special_attrs.attr2, Wrapper.ATTR2)
+        self.assertFalse(Wrapper.check_special_attrs.__annotations__)
+        self.assertFalse(hasattr(Wrapper.check_special_attrs, '__wrapped__'))
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 from polypie import polymorphic
 
 
-RESULT = 'module2'
+RESULT = 'clash2'
 
 
 @polymorphic

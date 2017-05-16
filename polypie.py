@@ -1,6 +1,7 @@
+from collections import OrderedDict
+from functools import update_wrapper
 from inspect import Signature, signature, Parameter
 from typing import get_type_hints
-from collections import OrderedDict
 
 from typecheck import typecheck, TypeCheckError
 
@@ -52,6 +53,13 @@ def _call_func(func_key, args=None, kwargs=None):
     )
 
 
+def update_dispatcher(dispatcher, func, assign=True):
+    assigned = ('__name__', '__qualname__', '__module__') if assign else ()
+    dispatcher = update_wrapper(dispatcher, func, assigned)
+    del dispatcher.__wrapped__
+    return dispatcher
+
+
 def polymorphic(func):
     global _registry
     func_key = func.__module__ + '.' + func.__qualname__
@@ -59,15 +67,14 @@ def polymorphic(func):
     parameters_tuple = tuple(
         HashableParameter.from_parameter(p) for p in parameters.values())
     if func_key not in _registry:
-        def wrapper(*args, **kwargs):
+        def dispatcher(*args, **kwargs):
             return _call_func(func_key, args, kwargs)
-        wrapper.__name__ = func.__name__
-        wrapper.__qualname__ = func.__qualname__
+        dispatcher = update_dispatcher(dispatcher, func, assign=True)
         signature_mapping = OrderedDict()
         signature_mapping[parameters_tuple] = func
-        signature_mapping.wrapper = wrapper
+        signature_mapping.dispatcher = dispatcher
         _registry[func_key] = signature_mapping
-        return wrapper
+        return dispatcher
     else:
         if parameters_tuple in _registry[func_key]:
             hints = get_type_hints(func)
@@ -80,4 +87,5 @@ def polymorphic(func):
             )
         else:
             _registry[func_key][parameters_tuple] = func
-            return _registry[func_key].wrapper
+            dispatcher = _registry[func_key].dispatcher
+            return update_dispatcher(dispatcher, func, assign=False)
