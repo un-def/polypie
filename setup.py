@@ -22,7 +22,7 @@ setup(
     name='polypie',
     version=version,
     py_modules=['polypie'],
-    install_requires=['typecheck-decorator>=1.3'],
+    install_requires=['typing<3.5.3', 'typecheck-decorator>=1.3'],
     test_suite='test_polypie.py',
     license='BSD License',
     description='Python polymorphic function declaration with obvious syntax',
