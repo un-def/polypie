@@ -3,11 +3,11 @@ from functools import update_wrapper
 from inspect import Signature, signature, Parameter
 from typing import get_type_hints
 
-from typecheck import typecheck, TypeCheckError
+from typeguard import check_argument_types, _CallMemo
 
 
 __author__ = 'un.def <un.def@ya.ru>'
-__version__ = '0.1.3'
+__version__ = '0.2.0.dev0'
 
 
 _registry = {}
@@ -39,12 +39,10 @@ def _call_func(func_key, args=None, kwargs=None):
     for parameters_tuple, func in _registry[func_key].items():
         try:
             Signature(parameters_tuple).bind(*args, **kwargs)
+            check_argument_types(_CallMemo(func, args=args, kwargs=kwargs))
         except TypeError:
             continue
-        try:
-            return typecheck(func)(*args, **kwargs)
-        except TypeCheckError:
-            pass
+        return func(*args, **kwargs)
     raise PolypieException(
         "Matсhing signature for function '{func}' with "
         "args={args} and kwargs={kwargs} not found".format(func=func_key,

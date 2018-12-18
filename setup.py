@@ -12,7 +12,7 @@ with open('README.rst') as f:
 
 with open('polypie.py') as f:
     author, author_email, version = re.search(
-        "__author__ = '(.+) <(.+)>'.+__version__ = '([.0-9]+)'",
+        "__author__ = '(.+) <(.+)>'.+__version__ = '([.0-9a-z]+)'",
         f.read(),
         flags=re.DOTALL
     ).groups()
@@ -22,8 +22,7 @@ setup(
     name='polypie',
     version=version,
     py_modules=['polypie'],
-    install_requires=['typing<3.5.3', 'typecheck-decorator>=1.3'],
-    test_suite='test_polypie.py',
+    install_requires=['typeguard'],
     license='BSD License',
     description='Python polymorphic function declaration with obvious syntax',
     long_description=long_description,
@@ -35,9 +34,10 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries',
         'Topic :: Utilities',
     ],
