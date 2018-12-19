@@ -1,3 +1,2 @@
 [run]
-include = polypie.py
-
+source = polypie
