@@ -47,7 +47,7 @@ def test_same_types_annotations():
         return 'int, str'
 
     assert f(120, 240) == 'int, int first'
-    assert f(a=120, b=240) =='int, int first'
+    assert f(a=120, b=240) == 'int, int first'
     assert f(x=120, y=240) == 'int, int second'
     assert f(120, 'foo') == 'int, str'
     assert f(a=120, b='foo') == 'int, str'

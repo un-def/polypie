@@ -1,5 +1,6 @@
 from polypie import polymorphic
 
+
 class Wrapper:
 
     ATTR1 = 'attr1'
