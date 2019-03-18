@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from functools import update_wrapper
-from inspect import Parameter, signature
+from inspect import signature
 from typing import get_type_hints
 
 from typeguard import check_argument_types, _CallMemo
@@ -16,21 +16,6 @@ _registry = {}
 class PolypieException(Exception):
 
     pass
-
-
-class HashableParameter(Parameter):
-
-    def __hash__(self):
-        return hash((self.name, self.kind, self.default, self.annotation))
-
-    @classmethod
-    def from_parameter(cls, parameter):
-        return cls(
-            name=parameter.name,
-            kind=parameter.kind,
-            default=parameter.default,
-            annotation=parameter.annotation
-        )
 
 
 def _call_func(func_key, args=None, kwargs=None):
@@ -60,8 +45,7 @@ def polymorphic(func):
     global _registry
     func_key = func.__module__ + '.' + func.__qualname__
     parameters = signature(func).parameters
-    parameters_tuple = tuple(
-        HashableParameter.from_parameter(p) for p in parameters.values())
+    parameters_tuple = tuple(parameters.values())
     if func_key not in _registry:
         def dispatcher(*args, **kwargs):
             return _call_func(func_key, args, kwargs)
