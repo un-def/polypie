@@ -6,4 +6,5 @@
 .pytest_cache/
 
 dist/
+build/
 polypie.egg-info/

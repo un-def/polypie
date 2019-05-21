@@ -6,8 +6,8 @@ from typing import get_type_hints
 from typeguard import check_argument_types, _CallMemo
 
 
-__author__ = 'un.def <un.def@ya.ru>'
-__version__ = '0.2.0.dev0'
+__author__ = 'un.def <me@undef.im>'
+__version__ = '0.2.0'
 
 
 _registry = {}
