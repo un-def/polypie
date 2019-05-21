@@ -3,6 +3,7 @@
 .tox/
 .cache/
 .coverage
+.pytest_cache/
 
 dist/
 polypie.egg-info/

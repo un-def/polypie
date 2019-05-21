@@ -15,8 +15,8 @@ Installation
 Requirements
 ~~~~~~~~~~~~
 
--  Python 3.3+
--  `typecheck-decorator <https://github.com/prechelt/typecheck-decorator>`__
+-  Python 3.5+
+-  `typeguard <https://github.com/agronholm/typeguard>`__ (will be installed automatically)
 
 Example
 ~~~~~~~
@@ -76,8 +76,7 @@ Example
 Tests
 ~~~~~
 
-1. Install dependencies: ``pip install -r requirements_dev.txt``
-2. ``nosetests --with-coverage`` or ``tox``
+``tox [-e ENV] [-- --cov]``
 
 .. |Build Status| image:: https://travis-ci.org/un-def/polypie.svg?branch=master
    :target: https://travis-ci.org/un-def/polypie
